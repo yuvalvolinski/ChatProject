@@ -3,14 +3,17 @@
 
 <head>
   <title>Index Page</title>
+  <link rel="stylesheet" href="Login.css">
 </head>
 
 <body>
-  <h1>Welcome to Chat!</h1>
+  <h1>Welcome to Global Chat!</h1>
 
-  <div>nick name: </div>
-  <input type="text" id="nick_name">
-  <button id="b_startChat">Login</button>
+  <input type="text" id="nick_name" placeholder="Nick name:"><br>
+  <input type="password" id="password" placeholder="Password:"><br>
+  <div style="color: white;background-color: black;">If you don't have a user, click <a href="/website/pages/SignIn.html" style="color: red;">here </a></div>
+  <button id="b_startChat" class="button1" style="margin-top: 10px;">Login</button>
+
 
   <script src="Login.js"></script>
   <script src="utilities.js"></script>
