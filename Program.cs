@@ -33,20 +33,20 @@ class Program
 
     Console.WriteLine("The server is running");
     Console.WriteLine($"Main Page: http://localhost:{port}/website/pages/login.html");
-    string basePath = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\website");
-
+    //Please set  the place of  website project in the  directory
+    string basePath  = @"D:\work\Yuval\Project 1 - Chat\Chat_project";
 
     while (true)
     {
       (var request, var response) = server.WaitForRequest();
 
       string relativePath = request.Path;
-      if(relativePath.IndexOf("website/")  > -1)
-      {
-          relativePath = relativePath.Replace("website/", "");
-      }
 
-  
+
+    if(basePath == "")
+    {
+      basePath = Directory.GetCurrentDirectory();
+    }
     string requestedFilePath = Path.Combine(basePath, relativePath);
 
     
@@ -162,7 +162,10 @@ class Program
             }
             else{
               response.Send("error");
+
             }
+
+
           
             
 
@@ -181,6 +184,12 @@ class Program
             
               }
             }
+
+            Message msg = new  Message();
+              msg.MessageContent  = NickName + " leave the chat";
+              msg.NickName = "";
+              msg.id = messageList.Count;
+              messageList.Add(msg);
 
 
 
