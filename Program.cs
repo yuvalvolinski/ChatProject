@@ -9,7 +9,8 @@ class Message
   public string NickName;
 }
 
-class User{
+class User
+{
   public string NickName;
   public string Password;
 
@@ -20,21 +21,23 @@ class User{
 
 class Program
 {
-  
-  
+
+
 
   static void Main()
   {
     int port = 5000;
-     List<User> usersList = new  List<User>();
-     List<Message>  messageList  = new List<Message>();
+    List<User> usersList = new List<User>();
+    List<Message> messageList = new List<Message>();
 
     var server = new Server(port);
 
     Console.WriteLine("The server is running");
     Console.WriteLine($"Main Page: http://localhost:{port}/website/pages/login.html");
+
     //Please set  the place of  website project in the  directory
-    string basePath  = @"D:\work\Yuval\Project 1 - Chat\Chat_project";
+    string basePath = @"C:\Users\User\Desktop\ChatProject";
+    string basePath404 = basePath + @"\website\pages\404.html";
 
     while (true)
     {
@@ -43,16 +46,16 @@ class Program
       string relativePath = request.Path;
 
 
-    if(basePath == "")
-    {
-      basePath = Directory.GetCurrentDirectory();
-    }
-    string requestedFilePath = Path.Combine(basePath, relativePath);
+      if (basePath == "")
+      {
+        basePath = Directory.GetCurrentDirectory();
+      }
+      string requestedFilePath = Path.Combine(basePath, relativePath);
 
-    
-    requestedFilePath = Path.GetFullPath(requestedFilePath);
 
-    Console.WriteLine($"Requested File Path: {requestedFilePath}");
+      requestedFilePath = Path.GetFullPath(requestedFilePath);
+
+      Console.WriteLine($"Requested File Path: {requestedFilePath}");
       if (File.Exists(requestedFilePath))
       {
         var file = new File(requestedFilePath);
@@ -60,7 +63,9 @@ class Program
       }
       else if (request.ExpectsHtml())
       {
-        var file = new File(Path.Combine(basePath, "pages/404.html"));
+        //var file = new File(Path.Combine(basePath, "pages/404.html"));
+        Console.WriteLine("404 Path" + basePath404);
+        var file = new File(basePath404);
         //var file = new File("website/pages/404.html");
         response.SetStatusCode(404);
         response.Send(file);
@@ -69,33 +74,39 @@ class Program
       {
         try
         {
-          
-           if(request.Path  == "NewMessage"){
+
+          if (request.Path == "NewMessage")
+          {
             (string message, string NickName) = request.GetBody<(string, string)>();
             //Console.WriteLine("New message");
-            Message msg = new  Message();
-            msg.MessageContent  = message;
+            Message msg = new Message();
+            msg.MessageContent = message;
             msg.NickName = NickName;
             msg.id = messageList.Count;
             messageList.Add(msg);
             //Console.WriteLine("count: " + messageList.Count);
 
           }
-          else if(request.Path == "Getmessages"){
+          else if (request.Path == "Getmessages")
+          {
             int messageCounter = request.GetBody<int>();
             messageCounter++;
             List<Message> NewMessageList = new List<Message>();
-            for(int i = messageCounter; i < messageList.Count ;  i++){
+            for (int i = messageCounter; i < messageList.Count; i++)
+            {
               NewMessageList.Add(messageList[i]);
             }
 
             response.Send(NewMessageList);
-          
+
           }
-          else if(request.Path == "GetUsers"){
+          else if (request.Path == "GetUsers")
+          {
             List<User> ActiveUsers = new List<User>();
-            for(int i = 0; i<usersList.Count;i++){
-              if(usersList[i].Active == true){
+            for (int i = 0; i < usersList.Count; i++)
+            {
+              if (usersList[i].Active == true)
+              {
                 ActiveUsers.Add(usersList[i]);
               }
             }
@@ -103,27 +114,32 @@ class Program
 
 
           }
-          else if(request.Path == "SignIn"){
+          else if (request.Path == "SignIn")
+          {
             (string NickName, string Password) = request.GetBody<(string, string)>();
-            bool is_exists =  false;
+            bool is_exists = false;
 
-            for(int i = 0; i<usersList.Count; i++){
-              if(usersList[i].NickName == NickName){
+            for (int i = 0; i < usersList.Count; i++)
+            {
+              if (usersList[i].NickName == NickName)
+              {
                 is_exists = true;
                 break;
 
               }
             }
 
-            if(is_exists == true){
+            if (is_exists == true)
+            {
               response.Send("exists");
-             
+
             }
-            else if(Password.Length<5){
+            else if (Password.Length < 5)
+            {
               response.Send("invalid");
-             
+
             }
-            
+
             else
             {
               User usr = new User();
@@ -137,65 +153,74 @@ class Program
 
             }
 
-            
+
           }
-          else if(request.Path == "Login"){
+          else if (request.Path == "Login")
+          {
             (string NickName, string Password) = request.GetBody<(string, string)>();
 
             bool is_ok = false;
 
-            for(int i = 0; i<usersList.Count; i++){
-              if(usersList[i].NickName == NickName && usersList[i].Password == Password){
-               is_ok = true; 
-               usersList[i].Active = true;
+            for (int i = 0; i < usersList.Count; i++)
+            {
+              if (usersList[i].NickName == NickName && usersList[i].Password == Password)
+              {
+                is_ok = true;
+                usersList[i].Active = true;
               }
             }
 
-            if(is_ok == true){
-              Message msg = new  Message();
-              msg.MessageContent  = NickName + " join to chat";
+            if (is_ok == true)
+            {
+              Message msg = new Message();
+              msg.MessageContent = NickName + " join to chat";
               msg.NickName = "";
               msg.id = messageList.Count;
               messageList.Add(msg);
-    
+
               response.Send("OK");
             }
-            else{
+            else
+            {
               response.Send("error");
 
             }
 
 
-          
-            
+
+
 
           }
-          else if(request.Path == "exit"){
+          else if (request.Path == "exit")
+          {
             string NickName = request.GetBody<string>();
             Console.WriteLine("ok");
 
-            for(int i = 0; i<usersList.Count; i++){
-              if(usersList[i].NickName == NickName){
+            for (int i = 0; i < usersList.Count; i++)
+            {
+              if (usersList[i].NickName == NickName)
+              {
 
                 usersList[i].Active = false;
                 response.Send("ok");
                 break;
 
-            
+
               }
             }
 
-            Message msg = new  Message();
-              msg.MessageContent  = NickName + " leave the chat";
-              msg.NickName = "";
-              msg.id = messageList.Count;
-              messageList.Add(msg);
+            Message msg = new Message();
+            msg.MessageContent = NickName + " leave the chat";
+            msg.NickName = "";
+            msg.id = messageList.Count;
+            messageList.Add(msg);
 
 
 
 
           }
-          else {
+          else
+          {
             response.SetStatusCode(405);
           }
         }
